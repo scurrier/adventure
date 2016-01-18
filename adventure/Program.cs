@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Dynamic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -14,12 +16,13 @@ namespace adventure
     {
         private static int[] RTEXT = new int[101];
         private static object[,] LLINE = new object[1001,23];
+        private static Random RAN = new Random();
 
         static void Main(string[] args)
         {
             // Adventures                                                                   //C ADVENTURES
                                                                                             //        IMPLICIT INTEGER(A-Z)
-            float RAN = 0.0F;                                                               //        REAL RAN
+                                                                                            //        REAL RAN
                                                                                             //        COMMON RTEXT,LLINE
             int[] IOBJ = new int[301];                                                      //        DIMENSION IOBJ(300),ICHAIN(100),IPLACE(100)
             int[] ICHAIN = new int[101];
@@ -206,138 +209,154 @@ namespace adventure
             Debug.WriteLine("Too many words");                                              //        PAUSE 'TOO MANY WORDS'
                                                                                             //
                                                                                             //
-                                                                                            //C TRAVEL = NEG IF LAST THIS SOURCE + DEST*1024 + KEYWORD
+            // TRAVEL = negative if last this source + dest*1024 + keyword                  // TRAVEL = NEG IF LAST THIS SOURCE + DEST*1024 + KEYWORD
                                                                                             //
-                                                                                            //C COND  = 1 IF LIGHT,  2 IF DON T ASK QUESTION
-                                                                                            //
-                                                                                            //
+            // COND = 1 if light, 2 if don't ask question                                   //C COND  = 1 IF LIGHT,  2 IF DON T ASK QUESTION
                                                                                             //
                                                                                             //
                                                                                             //
-     g1100: Debug.WriteLine("g1100");                                                       //1100    DO 1101 I=1,100
-                                                                                            //        IPLACE(I)=IPLT(I)
-                                                                                            //        IFIXED(I)=IFIXT(I)
-                                                                                            //1101    ICHAIN(I)=0
-                                                                                            //
-                                                                                            //        DO 1102 I=1,300
-                                                                                            //        COND(I)=0
-                                                                                            //        ABB(I)=0
-                                                                                            //1102    IOBJ(I)=0
-                                                                                            //        DO 1103 I=1,10
-                                                                                            //1103    COND(I)=1
-                                                                                            //        COND(16)=2
-                                                                                            //        COND(20)=2
-                                                                                            //        COND(21)=2
-                                                                                            //        COND(22)=2
-                                                                                            //        COND(23)=2
-                                                                                            //        COND(24)=2
-                                                                                            //        COND(25)=2
-                                                                                            //        COND(26)=2
-                                                                                            //        COND(31)=2
-                                                                                            //        COND(32)=2
-                                                                                            //        COND(79)=2
-                                                                                            //
-                                                                                            //        DO 1107 I=1,100
-                                                                                            //        KTEM=IPLACE(I)
-                                                                                            //        IF(KTEM.EQ.0)GOTO 1107
-                                                                                            //        IF(IOBJ(KTEM).NE.0) GOTO 1104
-                                                                                            //        IOBJ(KTEM)=I
-                                                                                            //        GO TO 1107
-                                                                                            //1104    KTEM=IOBJ(KTEM)
-                                                                                            //1105    IF(ICHAIN(KTEM).NE.0) GOTO 1106
-                                                                                            //        ICHAIN(KTEM)=I
-                                                                                            //        GOTO 1107
-                                                                                            //1106    KTEM=ICHAIN(KTEM)
-                                                                                            //        GOTO 1105
-                                                                                            //1107    CONTINUE
-                                                                                            //        IDWARF=0
-                                                                                            //        IFIRST=1
-                                                                                            //        IWEST=0
-                                                                                            //        ILONG=1
-                                                                                            //        IDETAL=0
-                                                                                            //        PAUSE 'INIT DONE'
                                                                                             //
                                                                                             //
+     g1100: for (int i = 1; i<=100; ++i)                                                     //1100    DO 1101 I=1,100
+            {
+                IPLACE[i]=IPLT[i];                                                          //        IPLACE(I)=IPLT(I)
+                IFIXED[i]=IFIXT[i];                                                         //        IFIXED(I)=IFIXT(I)
+                ICHAIN[i] = 0;                                                              //1101    ICHAIN(I)=0
+            }
                                                                                             //
-     g1:    Debug.WriteLine("g1");                                                          //1       CALL YES(65,1,0,YEA)
-                                                                                            //        L=1
-                                                                                            //        LOC=1
-                                                                                            //2       DO 73 I=1,3
-                                                                                            //        IF(ODLOC(I).NE.L.OR.DSEEN(I).EQ.0)GOTO 73
-                                                                                            //        L=LOC
-                                                                                            //        CALL SPEAK(2)
-                                                                                            //        GOTO 74
-                                                                                            //73      CONTINUE
-                                                                                            //74      LOC=L
+            for (int i = 1; i<=300; ++i)                                                    //        DO 1102 I=1,300
+            {
+                COND[i]=0;                                                                  //        COND(I)=0
+                ABB[i]=0;                                                                   //        ABB(I)=0
+                IOBJ[i]=0;                                                                  //1102    IOBJ(I)=0
+            }
+            for (int i = 1; i <= 10; ++i)                                                   //        DO 1103 I=1,10
+                COND[i] = 1;                                                                //1103    COND(I)=1
+            COND[16] = 2;                                                                   //        COND(16)=2
+            COND[20] = 2;                                                                   //        COND(20)=2
+            COND[21] = 2;                                                                   //        COND(21)=2
+            COND[22] = 2;                                                                   //        COND(22)=2
+            COND[23] = 2;                                                                   //        COND(23)=2
+            COND[24] = 2;                                                                   //        COND(24)=2
+            COND[25] = 2;                                                                   //        COND(25)=2
+            COND[26] = 2;                                                                   //        COND(26)=2
+            COND[31] = 2;                                                                   //        COND(31)=2
+            COND[32] = 2;                                                                   //        COND(32)=2
+            COND[79] = 2;                                                                   //        COND(79)=2
                                                                                             //
-                                                                                            //C DWARF STUFF
+            for (int i=1; i<=100; ++i)                                                      //        DO 1107 I=1,100
+            {
+                int KTEM = IPLACE[i];                                                       //        KTEM=IPLACE(I)
+                if (KTEM == 0) goto g1107;                                                  //        IF(KTEM.EQ.0)GOTO 1107
+                if (IOBJ[KTEM] != 0) goto g1104;                                            //        IF(IOBJ(KTEM).NE.0) GOTO 1104
+                IOBJ[KTEM] = i;                                                             //        IOBJ(KTEM)=I
+                goto g1107;                                                                 //        GO TO 1107
+     g1104:     KTEM = IOBJ[KTEM];                                                          //1104    KTEM=IOBJ(KTEM)
+     g1105:     if (ICHAIN[KTEM] != 0) goto g1106;                                          //1105    IF(ICHAIN(KTEM).NE.0) GOTO 1106
+                ICHAIN[KTEM] = i;                                                           //        ICHAIN(KTEM)=I
+                goto g1107;                                                                 //        GOTO 1107
+     g1106:     KTEM = ICHAIN[KTEM];                                                        //1106    KTEM=ICHAIN(KTEM)
+                goto g1105;                                                                 //        GOTO 1105
+     g1107:;                                                                                //1107    CONTINUE
+            }
+     g1:    int IDWARF = 0;                                                                 //        IDWARF=0
+            int IFIRST = 1;                                                                 //        IFIRST=1
+            int IWEST = 0;                                                                  //        IWEST=0
+            int ILONG = 1;                                                                  //        ILONG=1
+            int IDETAL = 0;                                                                 //        IDETAL=0
+            Debug.WriteLine("Init done");                                                   //        PAUSE 'INIT DONE'
                                                                                             //
-                                                                                            //        IF(IDWARF.NE.0) GOTO 60
-                                                                                            //        IF(LOC.EQ.15) IDWARF=1
-                                                                                            //        GOTO 71
-                                                                                            //60      IF(IDWARF.NE.1)GOTO 63
-                                                                                            //        IF(RAN(QZ).GT.0.05) GOTO 71
-                                                                                            //        IDWARF=2
-                                                                                            //        DO 61 I=1,3
-                                                                                            //        DLOC(I)=0
-                                                                                            //        ODLOC(I)=0
-                                                                                            //61      DSEEN(I)=0
-                                                                                            //        CALL SPEAK(3)
-                                                                                            //        ICHAIN(AXE)=IOBJ(LOC)
-                                                                                            //        IOBJ(LOC)=AXE
-                                                                                            //        IPLACE(AXE)=LOC
-                                                                                            //        GOTO 71
                                                                                             //
-                                                                                            //63      IDWARF=IDWARF+1
-                                                                                            //        ATTACK=0
-                                                                                            //        DTOT=0
-                                                                                            //        STICK=0
-                                                                                            //        DO 66 I=1,3
-                                                                                            //        IF(2*I+IDWARF.LT.8)GOTO 66
-                                                                                            //        IF(2*I+IDWARF.GT.23.AND.DSEEN(I).EQ.0)GOTO 66
-                                                                                            //        ODLOC(I)=DLOC(I)
-                                                                                            //        IF(DSEEN(I).NE.0.AND.LOC.GT.14)GOTO 65
-                                                                                            //        DLOC(I)=DTRAV(I*2+IDWARF-8)
-                                                                                            //        DSEEN(I)=0
-                                                                                            //        IF(DLOC(I).NE.LOC.AND.ODLOC(I).NE.LOC) GOTO 66
-                                                                                            //65      DSEEN(I)=1
-                                                                                            //        DLOC(I)=LOC
-                                                                                            //        DTOT=DTOT+1
-                                                                                            //        IF(ODLOC(I).NE.DLOC(I)) GOTO 66
-                                                                                            //        ATTACK=ATTACK+1
-                                                                                            //        IF(RAN(QZ).LT.0.1) STICK=STICK+1
-                                                                                            //66      CONTINUE
-                                                                                            //        IF(DTOT.EQ.0) GOTO 71
-                                                                                            //        IF(DTOT.EQ.1)GOTO 75
-                                                                                            //        TYPE 67,DTOT
-                                                                                            //67      FORMAT(' THERE ARE ',I2,' THREATENING LITTLE DWARVES IN THE
+                                                                                            //
+            int YEA = 0; Yes(65, 1, 0, ref YEA);                                            //1       CALL YES(65,1,0,YEA)
+            int L = 1;                                                                      //        L=1
+            int LOC = 1;                                                                    //        LOC=1
+     g2:    for (int i = 1; i<=3; ++i)                                                      //2       DO 73 I=1,3
+            {
+                if (ODLOC[i] != L || DSEEN[i] == 0) goto g73;                               //        IF(ODLOC(I).NE.L.OR.DSEEN(I).EQ.0)GOTO 73
+                L = LOC;                                                                    //        L=LOC
+                Speak(2);                                                                   //        CALL SPEAK(2)
+                goto g74;                                                                   //        GOTO 74
+     g73: ;                                                                                 //73      CONTINUE
+            }
+     g74:   LOC = L;                                                                        //74      LOC=L
+                                                                                            //
+            // Dwarf stuff                                                                  //C DWARF STUFF
+                                                                                            //
+            if (IDWARF != 0) goto g60;                                                      //        IF(IDWARF.NE.0) GOTO 60
+            if (LOC == 15) IDWARF = 1;                                                      //        IF(LOC.EQ.15) IDWARF=1
+            goto g71;                                                                       //        GOTO 71
+     g60:   if (IDWARF != 1) goto g63;                                                      //60      IF(IDWARF.NE.1)GOTO 63
+            if (RAN.NextDouble() > 0.05) goto g71;                                          //        IF(RAN(QZ).GT.0.05) GOTO 71
+            IDWARF = 2;                                                                     //        IDWARF=2
+            for (int i = 1; i <= 3; ++i)                                                    //        DO 61 I=1,3
+            {
+                DLOC[i] = 0;                                                                //        DLOC(I)=0
+                ODLOC[i] = 0;                                                               //        ODLOC(I)=0
+                DSEEN[i] = 0;                                                               //61      DSEEN(I)=0
+            }
+            Speak(3);                                                                       //        CALL SPEAK(3)
+            ICHAIN[AXE] = IOBJ[LOC];                                                        //        ICHAIN(AXE)=IOBJ(LOC)
+            IOBJ[LOC] = AXE;                                                                //        IOBJ(LOC)=AXE
+            IPLACE[AXE] = LOC;                                                              //        IPLACE(AXE)=LOC
+            goto g71;                                                                       //        GOTO 71
+                                                                                            //
+     g63:   IDWARF = IDWARF + 1;                                                            //63      IDWARF=IDWARF+1
+            int ATTACK = 0;                                                                 //        ATTACK=0
+            int DTOT = 0;                                                                   //        DTOT=0
+            int STICK = 0;                                                                  //        STICK=0
+            for (int i = 1; i <= 3; ++i)                                                    //        DO 66 I=1,3
+            { 
+                if (2 * i + IDWARF < 8) goto g66;                                           //        IF(2*I+IDWARF.LT.8)GOTO 66
+                if (2 * i + IDWARF > 23 && DSEEN[i] == 0) goto g66;                         //        IF(2*I+IDWARF.GT.23.AND.DSEEN(I).EQ.0)GOTO 66
+                ODLOC[i] = DLOC[i];                                                         //        ODLOC(I)=DLOC(I)
+                if (DSEEN[i] != 0 && LOC > 14) goto g65;                                    //        IF(DSEEN(I).NE.0.AND.LOC.GT.14)GOTO 65
+                DLOC[i] = DTRAV[i*2+IDWARF-8];                                              //        DLOC(I)=DTRAV(I*2+IDWARF-8)
+                DSEEN[i] = 0;                                                               //        DSEEN(I)=0
+                if (DLOC[i] != LOC && ODLOC[i] != LOC) goto g66;                            //        IF(DLOC(I).NE.LOC.AND.ODLOC(I).NE.LOC) GOTO 66
+     g65:       DSEEN[i] = 1;                                                               //65      DSEEN(I)=1
+                DLOC[i] = LOC;                                                              //        DLOC(I)=LOC
+                DTOT = DTOT + 1;                                                            //        DTOT=DTOT+1
+                if (ODLOC[i] != DLOC[i]) goto g66;                                          //        IF(ODLOC(I).NE.DLOC(I)) GOTO 66
+                ATTACK = ATTACK + 1;                                                        //        ATTACK=ATTACK+1
+                if (RAN.NextDouble() < 0.1) STICK = STICK + 1;                              //        IF(RAN(QZ).LT.0.1) STICK=STICK+1
+     g66:;                                                                                  //66      CONTINUE
+            }
+            if (DTOT == 0) goto g71;                                                        //        IF(DTOT.EQ.0) GOTO 71
+            if (DTOT == 1) goto g75;                                                        //        IF(DTOT.EQ.1)GOTO 75
+            var stemp = " There are {0} threatening little dwarves in the room with you.";  //        TYPE 67,DTOT
+            Console.WriteLine(String.Format(stemp, DTOT));                                  //67      FORMAT(' THERE ARE ',I2,' THREATENING LITTLE DWARVES IN THE
                                                                                             //        1  ROOM WITH YOU.',/)
-                                                                                            //        GOTO 77
-                                                                                            //75      CALL SPEAK(4)
-                                                                                            //77      IF(ATTACK.EQ.0)GOTO 71
-                                                                                            //        IF(ATTACK.EQ.1)GOTO 79
-                                                                                            //        TYPE 78,ATTACK
-                                                                                            //78      FORMAT(' ',I2,' OF THEM THROW KNIVES AT YOU!',/)
-                                                                                            //        GOTO 81
-                                                                                            //79      CALL SPEAK(5)
-                                                                                            //        CALL SPEAK(52+STICK)
-                                                                                            //        GOTO(71,83)(STICK+1)
+            goto g77;                                                                       //        GOTO 77
+     g75:   Speak(4);                                                                       //75      CALL SPEAK(4)
+     g77:   if (ATTACK == 0) goto g71;                                                      //77      IF(ATTACK.EQ.0)GOTO 71
+            if (ATTACK == 1) goto g79;                                                      //        IF(ATTACK.EQ.1)GOTO 79
+            stemp = " {0} of them throw knives at you!";                                    //        TYPE 78,ATTACK
+            Console.WriteLine(String.Format(stemp, ATTACK));                                //78      FORMAT(' ',I2,' OF THEM THROW KNIVES AT YOU!',/)
+            goto g81;                                                                       //        GOTO 81
+     g79:   Speak(5);                                                                       //79      CALL SPEAK(5)
+            Speak(52 + STICK);                                                              //        CALL SPEAK(52+STICK)
+            switch (STICK+1)                                                                //        GOTO(71,83)(STICK+1)
+            {
+                case 1: goto g71; break;
+                case 2: goto g83; break;
+            }
                                                                                             //
-                                                                                            //81      IF(STICK.EQ.0) GOTO 69
-                                                                                            //        IF(STICK.EQ.1)GOTO 82
-                                                                                            //        TYPE 68,STICK
-                                                                                            //68      FORMAT(' ',I2,' OF THEM GET YOU.',/)
-                                                                                            //        GOTO 83
-                                                                                            //82      CALL SPEAK(6)
-                                                                                            //83      PAUSE 'GAMES OVER'
-                                                                                            //        GOTO 71
-                                                                                            //69      CALL SPEAK(7)
+     g81:   if (STICK == 0) goto g69;                                                       //81      IF(STICK.EQ.0) GOTO 69
+            if (STICK == 1) goto g82;                                                       //        IF(STICK.EQ.1)GOTO 82
+            stemp = " {0} of them get you.";                                                //        TYPE 68,STICK
+            Console.WriteLine(String.Format(stemp, STICK));                                 //68      FORMAT(' ',I2,' OF THEM GET YOU.',/)
+            goto g83;                                                                       //        GOTO 83
+     g82:   Speak(6);                                                                       //82      CALL SPEAK(6)
+     g83:   Console.WriteLine("Game over");                                                 //83      PAUSE 'GAMES OVER'
+            goto g71;                                                                       //        GOTO 71
+     g69:   Speak(7);                                                                       //69      CALL SPEAK(7)
                                                                                             //
-                                                                                            //C PLACE DESCRIPTOR
+            // Place descriptor                                                             //C PLACE DESCRIPTOR
                                                                                             //
                                                                                             //
                                                                                             //
-                                                                                            //71      KK=STEXT(L)
+     g71:   KK=STEXT[L];                                                                    //71      KK=STEXT(L)
                                                                                             //        IF(ABB(L).EQ.0.OR.KK.EQ.0)KK=LTEXT(L)
                                                                                             //        IF(KK.EQ.0) GOTO 7
                                                                                             //4      TYPE 5,(LLINE(KK,JJ),JJ=3,LLINE(KK,2))
@@ -765,67 +784,72 @@ namespace adventure
                                                                                             //
                                                                                             //
                                                                                             //        END
+            ;
+        }
                                                                                             //
                                                                                             //
-                                                                                            //        SUBROUTINE SPEAK(IT)
-                                                                                            //        IMPLICIT INTEGER(A-Z)
+        public static void Speak(int IT)                                                    //        SUBROUTINE SPEAK(IT)
+        {                                                                                   //        IMPLICIT INTEGER(A-Z)
                                                                                             //        COMMON RTEXT,LLINE
                                                                                             //        DIMENSION RTEXT(100),LLINE(1000,22)
                                                                                             //
-                                                                                            //        KKT=RTEXT(IT)
-                                                                                            //        IF(KKT.EQ.0)RETURN
-                                                                                            //999     TYPE 998, (LLINE(KKT,JJT),JJT=3,LLINE(KKT,2))
-                                                                                            //998     FORMAT(20A5)
-                                                                                            //        KKT=KKT+1
-                                                                                            //        IF(LLINE(KKT-1,1).NE.0)GOTO 999
-                                                                                            //997     TYPE 996
+            var KKT = RTEXT[IT];                                                            //        KKT=RTEXT(IT)
+    s999:   if (KKT == 0) return;                                                           //        IF(KKT.EQ.0)RETURN
+            for (int JJT = 3; JJT <= (int)LLINE[KKT, 2]; ++JJT)                             //999     TYPE 998, (LLINE(KKT,JJT),JJT=3,LLINE(KKT,2))
+                Console.Write(LLINE[KKT,JJT]);                                              //998     FORMAT(20A5)
+            Console.WriteLine();
+            KKT = KKT + 1;                                                                  //        KKT=KKT+1
+            if ((int)LLINE[KKT-1, 1] != 0) goto s999;                                       //        IF(LLINE(KKT-1,1).NE.0)GOTO 999
+            Console.WriteLine();                                                            //997     TYPE 996
                                                                                             //996     FORMAT(/)
                                                                                             //        RETURN
-                                                                                            //        END
+         }                                                                                  //        END
                                                                                             //
                                                                                             //
-                                                                                            //        SUBROUTINE GETIN(TWOW,B,C,D)
-                                                                                            //        IMPLICIT INTEGER(A-Z)
-                                                                                            //        DIMENSION A(5),M2(6)
-                                                                                            //        DATA M2/"4000000000,"20000000,"100000,"400,"2,0/
-                                                                                            //6       ACCEPT 1,(A(I), I=1,4)
-                                                                                            //1       FORMAT(4A5)
-                                                                                            //        TWOW=0
-                                                                                            //        S=0
-                                                                                            //        B=A(1)
-                                                                                            //        DO 2 J=1,4
-                                                                                            //        DO 2 K=1,5
+        public static void GetIn(ref int TWOW, ref string B, ref string C, int D)                  //        SUBROUTINE GETIN(TWOW,B,C,D)
+        {                                                                                   //        IMPLICIT INTEGER(A-Z)
+            //I'm not porting this function                                                 //        DATA M2/"4000000000,"20000000,"100000,"400,"2,0/
+            //The PDP10 used int36 as it's word, and could store 5 ASCII-7                  //6       ACCEPT 1,(A(I), I=1,4)
+            //in each int.  This function gets two 5 characters words delimited by          //1       FORMAT(4A5)
+            //a space.  Given the system dependence, I'm just reimplementing                
+            TWOW = 0;                                                                       //        TWOW=0
+            B = "";                                                                         //        S=0
+            C = "";                                                                         //        B=A(1)
+            var line = Console.ReadLine();                                                  //        DO 2 J=1,4
+            var words = line.Split(null);                                                   //        DO 2 K=1,5
                                                                                             //        MASK1="774000000000
                                                                                             //        IF(K.NE.1) MASK1="177*M2(K)
-                                                                                            //        IF(((A(J).XOR."201004020100).AND.MASK1).EQ.0)GOTO 3
-                                                                                            //        IF(S.EQ.0) GOTO 2
-                                                                                            //        TWOW=1
-                                                                                            //        CALL SHIFT(A(J),7*(K-1),XX)
-                                                                                            //        CALL SHIFT(A(J+1),7*(K-6),YY)
-                                                                                            //        MASK=-M2(6-K)
-                                                                                            //        C=(XX.AND.MASK)+(YY.AND.(-2-MASK))
-                                                                                            //        GOTO 4
-                                                                                            //3       IF(S.EQ.1) GOTO 2
-                                                                                            //        S=1
-                                                                                            //        IF(J.EQ.1) B=(B.AND.-M2(K)).OR.("201004020100.AND.
-                                                                                            //        1 (-M2(K).XOR.-1))
+            if (words.Length != 0)                                                          //        IF(S.EQ.0) GOTO 2
+            {                                                                               //        TWOW=1
+                B = words[0].Substring(0, Math.Min(5, words[0].Length))                     //        CALL SHIFT(A(J),7*(K-1),XX)
+                    .ToUpper(CultureInfo.InvariantCulture);                                 //        CALL SHIFT(A(J+1),7*(K-6),YY)
+                if (words.Length > 1)                                                       //        MASK=-M2(6-K)
+                    {                                                                       //        C=(XX.AND.MASK)+(YY.AND.(-2-MASK))
+                        C = words[1].Substring(0, Math.Min(5, words[0].Length))             //        GOTO 4
+                        .ToUpper(CultureInfo.InvariantCulture);                             //3       IF(S.EQ.1) GOTO 2
+                TWOW = 1;                                                                   //        S=1
+                }                                                                           //        IF(J.EQ.1) B=(B.AND.-M2(K)).OR.("201004020100.AND.
+            }                                                                               //        1 (-M2(K).XOR.-1))
                                                                                             //2       CONTINUE
                                                                                             //4       D=A(2)
                                                                                             //        RETURN
-                                                                                            //        END
+        }                                                                                   //        END
                                                                                             //
-                                                                                            //        SUBROUTINE YES(X,Y,Z,YEA)
-                                                                                            //        IMPLICIT INTEGER(A-Z)
-                                                                                            //        CALL SPEAK(X)
-                                                                                            //        CALL GETIN(JUNK,IA1,JUNK,IB1)
-                                                                                            //        IF(IA1.EQ.'NO'.OR.IA1.EQ.'N') GOTO 1
-                                                                                            //        YEA=1
-                                                                                            //        IF(Y.NE.0) CALL SPEAK(Y)
-                                                                                            //        RETURN
-                                                                                            //1       YEA=0
-                                                                                            //        IF(Z.NE.0)CALL SPEAK(Z)
-                                                                                            //        RETURN
-                                                                                            //        END
+        public static void Yes(int X, int Y, int Z, ref int YEA)                                   //        SUBROUTINE YES(X,Y,Z,YEA)
+        {                                                                                   //        IMPLICIT INTEGER(A-Z)
+            string IA1 = "";
+            string JUNK2 = "";
+            int IB1 = 0, JUNK = 0;
+            Speak(X);                                                                       //        CALL SPEAK(X)
+            GetIn(ref JUNK, ref IA1, ref JUNK2, IB1);                                                //        CALL GETIN(JUNK,IA1,JUNK,IB1)
+            if (IA1 == "NO" || IA1 == "N") goto y1;                                         //        IF(IA1.EQ.'NO'.OR.IA1.EQ.'N') GOTO 1
+            YEA = 1;                                                                        //        YEA=1
+            if (Y != 0) Speak(Y);                                                           //        IF(Y.NE.0) CALL SPEAK(Y)
+            return;                                                                         //        RETURN
+        y1: YEA = 0;                                                                        //1       YEA=0
+            if(Z != 0) Speak(Z);                                                            //        IF(Z.NE.0)CALL SPEAK(Z)
+            return;                                                                         //        RETURN
+         }                                                                                  //        END
                                                                                             //
                                                                                             //
                                                                                             //
@@ -846,6 +870,5 @@ namespace adventure
                                                                                             //        RETURN
                                                                                             //        END
                                                                                             //
-        }
     }
 }
