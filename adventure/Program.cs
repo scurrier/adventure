@@ -64,6 +64,11 @@ namespace adventure
             int K = 0;
             int LOLD = 0;
             int JVERB = 0;
+            string A = "";
+            string WD2 = "";
+            string B = "";
+            int TWOWDS = 0;
+            int JSPK = 0;
 
             if (SETUP != 0) goto g1;                                                        //        IF(SETUP.NE.0) GOTO 1
             SETUP = 1;                                                                      //        SETUP=1
@@ -395,7 +400,7 @@ namespace adventure
             goto g21;                                                                       //        GOTO 21
      g10:   L=LL/1024;                                                                      //10      L=LL/1024
             goto g21;                                                                       //        GOTO 21
-     g11:   int JSPK = 12;                                                                  //11      JSPK=12
+     g11:   JSPK = 12;                                                                      //11      JSPK=12
             if (K >= 43 && K <= 46) JSPK = 9;                                               //        IF(K.GE.43.AND.K.LE.46)JSPK=9
             if (K == 29 || K == 30) JSPK = 9;                                               //        IF(K.EQ.29.OR.K.EQ.30)JSPK=9
             if (K == 7 || K == 8 || K == 36 || K == 37 || K == 68)                          //        IF(K.EQ.7.OR.K.EQ.8.OR.K.EQ.36.OR.K.EQ.37.OR.K.EQ.68)
@@ -496,310 +501,356 @@ namespace adventure
             // Do next input                                                                //C DO NEXT INPUT
                                                                                             //
                                                                                             //
-     g2000: Debug.WriteLine("g2000");                                                       //2000    LTRUBL=0
-                                                                                            //        LOC=J
-                                                                                            //        ABB(J)=MOD((ABB(J)+1),5)
-                                                                                            //        IDARK=0
-                                                                                            //        IF(MOD(COND(J),2).EQ.1) GOTO 2003
-                                                                                            //        IF((IPLACE(2).NE.J).AND.(IPLACE(2).NE.-1)) GOTO 2001
-                                                                                            //        IF(PROP(2).EQ.1)GOTO 2003
-                                                                                            //2001    CALL SPEAK(16)
-                                                                                            //        IDARK=1
+     g2000: int LTRUBL = 0;                                                                 //2000    LTRUBL=0
+            LOC = J;                                                                        //        LOC=J
+            ABB[J] = (ABB[J] + 1)%5;                                                        //        ABB(J)=MOD((ABB(J)+1),5)
+            int IDARK = 0;                                                                  //        IDARK=0
+            if (COND[J]%2 == 1) goto g2003;                                                 //        IF(MOD(COND(J),2).EQ.1) GOTO 2003
+            if (IPLACE[2] != J && IPLACE[2] != -1) goto g2001;                              //        IF((IPLACE(2).NE.J).AND.(IPLACE(2).NE.-1)) GOTO 2001
+            if (PROP[2] == 1) goto g2003;                                                   //        IF(PROP(2).EQ.1)GOTO 2003
+     g2001: Speak(16);                                                                      //2001    CALL SPEAK(16)
+            IDARK = 1;                                                                      //        IDARK=1
                                                                                             //
                                                                                             //
-                                                                                            //2003    I=IOBJ(J)
-                                                                                            //2004    IF(I.EQ.0) GOTO 2011
-                                                                                            //        IF(((I.EQ.6).OR.(I.EQ.9)).AND.(IPLACE(10).EQ.-1))GOTO 2008
-                                                                                            //        ILK=I
-                                                                                            //        IF(PROP(I).NE.0) ILK=I+100
-                                                                                            //        KK=BTEXT(ILK)
-                                                                                            //        IF(KK.EQ.0) GOTO 2008
-                                                                                            //2005    TYPE 2006,(LLINE(KK,JJ),JJ=3,LLINE(KK,2))
-                                                                                            //2006    FORMAT(20A5)
-                                                                                            //        KK=KK+1
-                                                                                            //        IF(LLINE(KK-1,1).NE.0) GOTO 2005
-                                                                                            //        TYPE 2007
+     g2003: I=IOBJ[J];                                                                      //2003    I=IOBJ(J)
+     g2004: if (I == 0) goto g2011;                                                         //2004    IF(I.EQ.0) GOTO 2011
+            if ((I==6 || I==9) && (IPLACE[10]==-1)) goto g2008;                             //        IF(((I.EQ.6).OR.(I.EQ.9)).AND.(IPLACE(10).EQ.-1))GOTO 2008
+            int ILK = I;                                                                    //        ILK=I
+            if (PROP[I] != 0) ILK = I + 100;                                                //        IF(PROP(I).NE.0) ILK=I+100
+            KK = BTEXT[ILK];                                                                //        KK=BTEXT(ILK)
+            if (KK == 0) goto g2008;                                                        //        IF(KK.EQ.0) GOTO 2008
+     g2005: for (int jj = 3; jj <= (int)LLINE[KK,2]; ++jj)                                  //2005    TYPE 2006,(LLINE(KK,JJ),JJ=3,LLINE(KK,2))
+                Console.Write(LLINE[KK,jj]);                                                //2006    FORMAT(20A5)
+            Console.WriteLine();
+            KK = KK + 1;                                                                    //        KK=KK+1
+            if ((int)LLINE[KK-1,1] != 0) goto g2005;                                        //        IF(LLINE(KK-1,1).NE.0) GOTO 2005
+            Console.WriteLine();                                                            //        TYPE 2007
                                                                                             //2007    FORMAT(/)
-                                                                                            //2008    I=ICHAIN(I)
-                                                                                            //        GOTO 2004
+     g2008: I = ICHAIN[I];                                                                  //2008    I=ICHAIN(I)
+            goto g2004;                                                                     //        GOTO 2004
                                                                                             //
                                                                                             //
                                                                                             //
-                                                                                            //C K=1 MEANS ANY INPUT
+            // K=1 means any input                                                          //C K=1 MEANS ANY INPUT
                                                                                             //
                                                                                             //
-                                                                                            //2012    A=WD2
+     g2012: A=WD2;                                                                          //2012    A=WD2
                                                                                             //        B=' '
-                                                                                            //        TWOWDS=0
-                                                                                            //        GOTO 2021
+            TWOWDS = 0;                                                                     //        TWOWDS=0
+            goto g2021;                                                                     //        GOTO 2021
                                                                                             //
-                                                                                            //2009    K=54
-                                                                                            //2010    JSPK=K
-                                                                                            //5200    CALL SPEAK(JSPK)
+     g2009: K = 54;                                                                         //2009    K=54
+     g2010: JSPK = K;                                                                       //2010    JSPK=K
+     g5200: Speak(JSPK);                                                                    //5200    CALL SPEAK(JSPK)
                                                                                             //
-                                                                                            //2011    JVERB=0
-                                                                                            //        JOBJ=0
-                                                                                            //        TWOWDS=0
+     g2011: JVERB = 0;                                                                      //2011    JVERB=0
+            int JOBJ = 0;                                                                   //        JOBJ=0
+            TWOWDS = 0;                                                                     //        TWOWDS=0
                                                                                             //
-                                                                                            //2020    CALL GETIN(TWOWDS,A,WD2,B)
-                                                                                            //        K=70
-                                                                                            //        IF(A.EQ.'ENTER'.AND.(WD2.EQ.'STREA'.OR.WD2.EQ.'WATER'))GOTO 2010
-                                                                                            //        IF(A.EQ.'ENTER'.AND.TWOWDS.NE.0)GOTO 2012
-                                                                                            //2021    IF(A.NE.'WEST')GOTO 2023
-                                                                                            //        IWEST=IWEST+1
-                                                                                            //        IF(IWEST.NE.10)GOTO 2023
-                                                                                            //        CALL SPEAK(17)
-                                                                                            //2023    DO 2024 I=1,1000
-                                                                                            //        IF(KTAB(I).EQ.-1)GOTO 3000
-                                                                                            //        IF(ATAB(I).EQ.A)GOTO 2025
-                                                                                            //2024    CONTINUE
-                                                                                            //        PAUSE 'ERROR 6'
-                                                                                            //2025    K=MOD(KTAB(I),1000)
-                                                                                            //        KQ=KTAB(I)/1000+1
-                                                                                            //        GOTO (5014,5000,2026,2010)KQ
-                                                                                            //        PAUSE 'NO NO'
-                                                                                            //2026    JVERB=K
-                                                                                            //        JSPK=JSPKT(JVERB)
-                                                                                            //        IF(TWOWDS.NE.0)GOTO 2028
-                                                                                            //        IF(JOBJ.EQ.0)GOTO 2036
-                                                                                            //2027    GOTO(9000,5066,3000,5031,2009,5031,9404,9406,5081,5200,
+     g2020: GetIn(ref TWOWDS, ref A, ref WD2, ref B);                                       //2020    CALL GETIN(TWOWDS,A,WD2,B)
+            K = 70;                                                                         //        K=70
+            if (A == "ENTER" && (WD2 == "STREA" || WD2 == "WATER")) goto g2010;             //        IF(A.EQ.'ENTER'.AND.(WD2.EQ.'STREA'.OR.WD2.EQ.'WATER'))GOTO 2010
+            if (A == "ENTER" && TWOWDS != 0) goto g2012;                                    //        IF(A.EQ.'ENTER'.AND.TWOWDS.NE.0)GOTO 2012
+     g2021: if (A != "WEST") goto g2023;                                                    //2021    IF(A.NE.'WEST')GOTO 2023
+            IWEST = IWEST + 1;                                                              //        IWEST=IWEST+1
+            if (IWEST != 10) goto g2023;                                                    //        IF(IWEST.NE.10)GOTO 2023
+            Speak(17);                                                                      //        CALL SPEAK(17)
+     g2023: for (I = 1; I <= 1000; ++I)                                                 //2023    DO 2024 I=1,1000
+            {
+                if (KTAB[I] == -1) goto g3000;                                              //        IF(KTAB(I).EQ.-1)GOTO 3000
+                if (ATAB[I] == A) goto g2025;                                               //        IF(ATAB(I).EQ.A)GOTO 2025
+            }                                                                               //2024    CONTINUE
+            Debug.WriteLine("Error 6");                                                     //        PAUSE 'ERROR 6'
+     g2025: K = KTAB[I] % 1000;                                                             //2025    K=MOD(KTAB(I),1000)
+            int KQ = KTAB[I]/1000 + 1;                                                      //        KQ=KTAB(I)/1000+1
+            switch(KQ)                                                                      //        GOTO (5014,5000,2026,2010)KQ
+            {
+                case 1: goto g5014; break;
+                case 2: goto g5000; break;
+                case 3: goto g2026; break;
+                case 4: goto g2010; break;
+            }
+            Console.WriteLine("No no");                                                     //        PAUSE 'NO NO'
+     g2026: JVERB = K;                                                                      //2026    JVERB=K
+            JSPK = JSPKT[JVERB];                                                            //        JSPK=JSPKT(JVERB)
+            if (TWOWDS != 0) goto g2028;                                                    //        IF(TWOWDS.NE.0)GOTO 2028
+            if (JOBJ == 0) goto g2036;                                                      //        IF(JOBJ.EQ.0)GOTO 2036
+     g2027: switch (JVERB)                                                                  //2027    GOTO(9000,5066,3000,5031,2009,5031,9404,9406,5081,5200,
                                                                                             //        1 5200,5300,5506,5502,5504,5505)JVERB
-                                                                                            //        PAUSE 'ERROR 5'
+            {
+                case 1: goto g9000; break;
+                case 2: goto g5066; break;
+                case 3: goto g3000; break;
+                case 4: goto g5031; break;
+                case 5: goto g2009; break;
+                case 6: goto g5031; break;
+                case 7: goto g9404; break;
+                case 8: goto g9406; break;
+                case 9: goto g5081; break;
+                case 10: goto g5200; break;
+                case 11: goto g5200; break;
+                case 12: goto g5300; break;
+                case 13: goto g5506; break;
+                case 14: goto g5502; break;
+                case 15: goto g5504; break;
+                case 16: goto g5505; break;
+            }
+            Debug.WriteLine("Error 5");                                                     //        PAUSE 'ERROR 5'
                                                                                             //
                                                                                             //
-                                                                                            //2028    A=WD2
+     g2028: A = WD2;                                                                        //2028    A=WD2
                                                                                             //        B=' '
-                                                                                            //        TWOWDS=0
-                                                                                            //        GOTO 2023
+            TWOWDS = 0;                                                                     //        TWOWDS=0
+            goto g2023;                                                                     //        GOTO 2023
                                                                                             //
-                                                                                            //3000    JSPK=60
-                                                                                            //        IF(RAN(QZ).GT.0.8)JSPK=61
-                                                                                            //        IF(RAN(QZ).GT.0.8)JSPK=13
-                                                                                            //        CALL SPEAK(JSPK)
-                                                                                            //        LTRUBL=LTRUBL+1
-                                                                                            //        IF(LTRUBL.NE.3)GOTO 2020
-                                                                                            //        IF(J.NE.13.OR.IPLACE(7).NE.13.OR.IPLACE(5).NE.-1)GOTO 2032
-                                                                                            //        CALL YES(18,19,54,YEA)
-                                                                                            //        GOTO 2033
-                                                                                            //2032    IF(J.NE.19.OR.PROP(11).NE.0.OR.IPLACE(7).EQ.-1)GOTO 2034
-                                                                                            //        CALL YES(20,21,54,YEA)
-                                                                                            //        GOTO 2033
-                                                                                            //2034    IF(J.NE.8.OR.PROP(GRATE).NE.0)GOTO 2035
-                                                                                            //        CALL YES(62,63,54,YEA)
-                                                                                            //2033    IF(YEA.EQ.0)GOTO 2011
-                                                                                            //        GOTO 2020
-                                                                                            //2035    IF(IPLACE(5).NE.J.AND.IPLACE(5).NE.-1)GOTO 2020
-                                                                                            //        IF(JOBJ.NE.5)GOTO 2020
-                                                                                            //        CALL SPEAK(22)
-                                                                                            //        GOTO 2020
+     g3000: JSPK = 60;                                                                      //3000    JSPK=60
+            if (RAN.NextDouble() > 0.8) JSPK = 61;                                          //        IF(RAN(QZ).GT.0.8)JSPK=61
+            if (RAN.NextDouble() > 0.8) JSPK = 13;                                          //        IF(RAN(QZ).GT.0.8)JSPK=13
+            Speak(JSPK);                                                                    //        CALL SPEAK(JSPK)
+            LTRUBL = LTRUBL + 1;                                                            //        LTRUBL=LTRUBL+1
+            if (LTRUBL != 3) goto g2020;                                                    //        IF(LTRUBL.NE.3)GOTO 2020
+            if (J != 13 || IPLACE[7] != 13 || IPLACE[5] != -1) goto g2032;                  //        IF(J.NE.13.OR.IPLACE(7).NE.13.OR.IPLACE(5).NE.-1)GOTO 2032
+            Yes(18, 19, 54, ref YEA);                                                       //        CALL YES(18,19,54,YEA)
+            goto g2033;                                                                     //        GOTO 2033
+     g2032: if (J != 19 || PROP[11] != 0 || IPLACE[7] == -1) goto g2034;                    //2032    IF(J.NE.19.OR.PROP(11).NE.0.OR.IPLACE(7).EQ.-1)GOTO 2034
+            Yes(20, 21, 54, ref YEA);                                                       //        CALL YES(20,21,54,YEA)
+            goto g2033;                                                                     //        GOTO 2033
+     g2034: if (J != 8 || PROP[GRATE] != 0) goto g2035;                                     //2034    IF(J.NE.8.OR.PROP(GRATE).NE.0)GOTO 2035
+            Yes(62, 63, 54, ref YEA);                                                       //        CALL YES(62,63,54,YEA)
+     g2033: if (YEA == 0) goto g2011;                                                       //2033    IF(YEA.EQ.0)GOTO 2011
+            goto g2020;                                                                     //        GOTO 2020
+     g2035: if (IPLACE[5] != J && IPLACE[5] != -1) goto g2020;                              //2035    IF(IPLACE(5).NE.J.AND.IPLACE(5).NE.-1)GOTO 2020
+            if (JOBJ != 5) goto g2020;                                                      //        IF(JOBJ.NE.5)GOTO 2020
+            Speak(22);                                                                      //        CALL SPEAK(22)
+            goto g2020;                                                                     //        GOTO 2020
                                                                                             //
                                                                                             //
-                                                                                            //2036    GOTO(2037,5062,5062,9403,2009,9403,9404,9406,5062,5062,
+     g2036: switch(JVERB)                                                                   //2036    GOTO(2037,5062,5062,9403,2009,9403,9404,9406,5062,5062,
                                                                                             //        1 5200,5300,5062,5062,5062,5062)JVERB
-                                                                                            //        PAUSE 'OOPS'
-                                                                                            //2037    IF((IOBJ(J).EQ.0).OR.(ICHAIN(IOBJ(J)).NE.0)) GOTO 5062
-                                                                                            //        DO 5312 I=1,3
-                                                                                            //        IF(DSEEN(I).NE.0)GOTO 5062
+            {
+                case 1: goto g2037; break;
+                case 2: goto g5062; break;
+                case 3: goto g5062; break;
+                case 4: goto g9403; break;
+                case 5: goto g2009; break;
+                case 6: goto g9403; break;
+                case 7: goto g9404; break;
+                case 8: goto g9406; break;
+                case 9: goto g5062; break;
+                case 10: goto g5062; break;
+                case 11: goto g5200; break;
+                case 12: goto g5300; break;
+                case 13: goto g5062; break;
+                case 14: goto g5062; break;
+                case 15: goto g5062; break;
+                case 16: goto g5062; break;
+            }
+            Debug.WriteLine("Oops");                                                        //        PAUSE 'OOPS'
+     g2037: if ((IOBJ[J] == 0) || (ICHAIN[IOBJ[J]] != 0)) goto g5062;                       //2037    IF((IOBJ(J).EQ.0).OR.(ICHAIN(IOBJ(J)).NE.0)) GOTO 5062
+            for (I = 1; I <= 3; ++I)                                                        //        DO 5312 I=1,3
+                if (DSEEN[I] != 0) goto g5062;                                              //        IF(DSEEN(I).NE.0)GOTO 5062
                                                                                             //5312    CONTINUE
-                                                                                            //        JOBJ=IOBJ(J)
-                                                                                            //        GOTO 2027
-                                                                                            //5062    IF(B.NE.' ')GOTO 5333
-                                                                                            //        TYPE 5063,A
+            JOBJ = IOBJ[J];                                                                 //        JOBJ=IOBJ(J)
+            goto g2027;                                                                     //        GOTO 2027
+     g5062: if (B!="") goto g5333;                                                           //5062    IF(B.NE.' ')GOTO 5333
+            Console.WriteLine("  " + A + " what?");                                         //        TYPE 5063,A
                                                                                             //5063    FORMAT('  ',A5,' WHAT?',/)
-                                                                                            //        GOTO 2020
+            goto g2020;                                                                     //        GOTO 2020
                                                                                             //
-                                                                                            //5333    TYPE 5334,A,B
+     g5333: Console.WriteLine(" "+ A + B + " what?");                                       //5333    TYPE 5334,A,B
                                                                                             //5334    FORMAT(' ',2A5,' WHAT?',/)
-                                                                                            //        GOTO 2020
-                                                                                            //5014    IF(IDARK.EQ.0) GOTO 8
+            goto g2020;                                                                     //        GOTO 2020
+     g5014: if (IDARK == 0) goto g8;                                                        //5014    IF(IDARK.EQ.0) GOTO 8
                                                                                             //
-                                                                                            //        IF(RAN(QZ).GT.0.25) GOTO 8
-                                                                                            //5017    CALL SPEAK(23)
-                                                                                            //        PAUSE 'GAME IS OVER'
-                                                                                            //        GOTO 2011
+            if (RAN.NextDouble() > 0.25) goto g8;                                           //        IF(RAN(QZ).GT.0.25) GOTO 8
+     g5017: Speak(23);                                                                      //5017    CALL SPEAK(23)
+            Console.WriteLine("Game is over");                                              //        PAUSE 'GAME IS OVER'
+            goto g2011;                                                                     //        GOTO 2011
                                                                                             //
                                                                                             //
                                                                                             //
-                                                                                            //5000    JOBJ=K
-                                                                                            //        IF(TWOWDS.NE.0)GOTO 2028
-                                                                                            //        IF((J.EQ.IPLACE(K)).OR.(IPLACE(K).EQ.-1)) GOTO 5004
-                                                                                            //        IF(K.NE.GRATE)GOTO 502
-                                                                                            //        IF((J.EQ.1).OR.(J.EQ.4).OR.(J.EQ.7))GOTO 5098
-                                                                                            //        IF((J.GT.9).AND.(J.LT.15))GOTO 5097
-                                                                                            //502     IF(B.NE.' ')GOTO 5316
-                                                                                            //        TYPE 5005,A
+     g5000: JOBJ = K;                                                                       //5000    JOBJ=K
+            if (TWOWDS != 0) goto g2028;                                                    //        IF(TWOWDS.NE.0)GOTO 2028
+            if ((J == IPLACE[K]) || (IPLACE[K] == -1)) goto g5004;                          //        IF((J.EQ.IPLACE(K)).OR.(IPLACE(K).EQ.-1)) GOTO 5004
+            if (K != GRATE) goto g502;                                                      //        IF(K.NE.GRATE)GOTO 502
+            if ((J == 1) || (J == 4) || (J == 7)) goto g5098;                               //        IF((J.EQ.1).OR.(J.EQ.4).OR.(J.EQ.7))GOTO 5098
+            if (J > 9 && J < 15) goto g5097;                                                //        IF((J.GT.9).AND.(J.LT.15))GOTO 5097
+     g502:  if (B != "") goto g5316;                                                        //502     IF(B.NE.' ')GOTO 5316
+            Console.WriteLine(" I see no " + A + " here.");                                 //        TYPE 5005,A
                                                                                             //5005    FORMAT(' I SEE NO ',A5,' HERE.',/)
-                                                                                            //        GOTO 2011
-                                                                                            //5316    TYPE 5317,A,B
+            goto g2011;                                                                     //        GOTO 2011
+     g5316: Console.WriteLine(" I see no " + A + B + " here.");                             //5316    TYPE 5317,A,B
                                                                                             //5317    FORMAT(' I SEE NO ',2A5,' HERE.'/)
-                                                                                            //        GOTO 2011
-                                                                                            //5098    K=49
-                                                                                            //        GOTO 5014
-                                                                                            //5097    K=50
-                                                                                            //        GOTO 5014
-                                                                                            //5004    JOBJ=K
-                                                                                            //        IF(JVERB.NE.0)GOTO 2027
+            goto g2011;                                                                     //        GOTO 2011
+     g5098: K = 49;                                                                         //5098    K=49
+            goto g5014;                                                                     //        GOTO 5014
+     g5097: K = 50;                                                                         //5097    K=50
+            goto g5014;                                                                     //        GOTO 5014
+     g5004: JOBJ = K;                                                                       //5004    JOBJ=K
+            if (JVERB != 0) goto g2027;                                                     //        IF(JVERB.NE.0)GOTO 2027
                                                                                             //
                                                                                             //
-                                                                                            //5064    IF(B.NE.' ')GOTO 5314
-                                                                                            //        TYPE 5001,A
-                                                                                            //5001    FORMAT(' WHAT DO YOU WANT TO DO WITH THE ',A5,'?',/)
-                                                                                            //        GOTO 2020
-                                                                                            //5314    TYPE 5315,A,B
-                                                                                            //5315    FORMAT(' WHAT DO YOU WANT TO DO WITH THE ',2A5,'?',/)
-                                                                                            //        GOTO 2020
+     g5064: if (B != "") goto g5314;                                                        //5064    IF(B.NE.' ')GOTO 5314
+            Console.WriteLine(" What do you want to do with the " +                          //        TYPE 5001,A
+                              A + "?");                                                     //5001    FORMAT(' WHAT DO YOU WANT TO DO WITH THE ',A5,'?',/)
+            goto g2020;                                                                     //        GOTO 2020
+     g5314: Console.WriteLine(" What do you want to do with the " +                         //5314    TYPE 5315,A,B
+                              A + B + "?");                                                 //5315    FORMAT(' WHAT DO YOU WANT TO DO WITH THE ',2A5,'?',/)
+            goto g2020;                                                                     //        GOTO 2020
                                                                                             //
-                                                                                            //C CARRY
+            // Carry                                                                        //C CARRY
                                                                                             //
-                                                                                            //9000    IF(JOBJ.EQ.18)GOTO 2009
-                                                                                            //        IF(IPLACE(JOBJ).NE.J) GOTO 5200
-                                                                                            //9001    IF(IFIXED(JOBJ).EQ.0)GOTO 9002
-                                                                                            //        CALL SPEAK(25)
-                                                                                            //        GOTO 2011
-                                                                                            //9002    IF(JOBJ.NE.BIRD)GOTO 9004
-                                                                                            //        IF(IPLACE(ROD).NE.-1)GOTO 9003
-                                                                                            //        CALL SPEAK(26)
-                                                                                            //        GOTO 2011
-                                                                                            //9003    IF((IPLACE(4).EQ.-1).OR.(IPLACE(4).EQ.J)) GOTO 9004
-                                                                                            //        CALL SPEAK(27)
-                                                                                            //        GOTO 2011
-                                                                                            //9004    IPLACE(JOBJ)=-1
-                                                                                            //9005    IF(IOBJ(J).NE.JOBJ) GOTO 9006
-                                                                                            //        IOBJ(J)=ICHAIN(JOBJ)
-                                                                                            //        GOTO 2009
-                                                                                            //9006    ITEMP=IOBJ(J)
-                                                                                            //9007    IF(ICHAIN(ITEMP).EQ.(JOBJ)) GOTO 9008
-                                                                                            //        ITEMP=ICHAIN(ITEMP)
-                                                                                            //        GOTO 9007
-                                                                                            //9008    ICHAIN(ITEMP)=ICHAIN(JOBJ)
-                                                                                            //        GOTO 2009
-                                                                                            //
-                                                                                            //
-                                                                                            //C LOCK, UNLOCK, NO OBJECT YET
-                                                                                            //
-                                                                                            //9403    IF((J.EQ.8).OR.(J.EQ.9))GOTO 5105
-                                                                                            //5032    CALL SPEAK(28)
-                                                                                            //        GOTO 2011
-                                                                                            //5105    JOBJ=GRATE
-                                                                                            //        GOTO 2027
-                                                                                            //
-                                                                                            //C DISCARD OBJECT
-                                                                                            //
-                                                                                            //5066    IF(JOBJ.EQ.18)GOTO 2009
-                                                                                            //        IF(IPLACE(JOBJ).NE.-1) GOTO 5200
-                                                                                            //5012    IF((JOBJ.NE.BIRD).OR.(J.NE.19).OR.(PROP(11).EQ.1))GOTO 9401
-                                                                                            //        CALL SPEAK(30)
-                                                                                            //        PROP(11)=1
-                                                                                            //5160    ICHAIN(JOBJ)=IOBJ(J)
-                                                                                            //        IOBJ(J)=JOBJ
-                                                                                            //        IPLACE(JOBJ)=J
-                                                                                            //        GOTO 2011
-                                                                                            //
-                                                                                            //9401    CALL SPEAK(54)
-                                                                                            //        GOTO 5160
-                                                                                            //
-                                                                                            //C LOCK,UNLOCK OBJECT
-                                                                                            //
-                                                                                            //5031    IF(IPLACE(KEYS).NE.-1.AND.IPLACE(KEYS).NE.J)GOTO 5200
-                                                                                            //        IF(JOBJ.NE.4)GOTO 5102
-                                                                                            //        CALL SPEAK(32)
-                                                                                            //        GOTO 2011
-                                                                                            //5102    IF(JOBJ.NE.KEYS)GOTO 5104
-                                                                                            //        CALL SPEAK(55)
-                                                                                            //        GOTO 2011
-                                                                                            //5104    IF(JOBJ.EQ.GRATE)GOTO 5107
-                                                                                            //        CALL SPEAK(33)
-                                                                                            //        GOTO 2011
-                                                                                            //5107    IF(JVERB.EQ.4) GOTO 5033
-                                                                                            //        IF(PROP(GRATE).NE.0)GOTO 5034
-                                                                                            //        CALL SPEAK(34)
-                                                                                            //        GOTO 2011
-                                                                                            //5034    CALL SPEAK(35)
-                                                                                            //        PROP(GRATE)=0
-                                                                                            //        PROP(8)=0
-                                                                                            //        GOTO 2011
-                                                                                            //5033    IF(PROP(GRATE).EQ.0)GOTO 5109
-                                                                                            //        CALL SPEAK(36)
-                                                                                            //        GOTO 2011
-                                                                                            //5109    CALL SPEAK(37)
-                                                                                            //        PROP(GRATE)=1
-                                                                                            //        PROP(8)=1
-                                                                                            //        GOTO 2011
+     g9000: if (JOBJ == 18) goto g2009;                                                     //9000    IF(JOBJ.EQ.18)GOTO 2009
+            if (IPLACE[JOBJ] != J) goto g5200;                                              //        IF(IPLACE(JOBJ).NE.J) GOTO 5200
+     g9001: if (IFIXED[JOBJ] == 0) goto g9002;                                              //9001    IF(IFIXED(JOBJ).EQ.0)GOTO 9002
+            Speak(25);                                                                      //        CALL SPEAK(25)
+            goto g2011;                                                                     //        GOTO 2011
+     g9002: if (JOBJ != BIRD) goto g9004;                                                   //9002    IF(JOBJ.NE.BIRD)GOTO 9004
+            if (IPLACE[ROD] != -1) goto g9003;                                              //        IF(IPLACE(ROD).NE.-1)GOTO 9003
+            Speak(26);                                                                      //        CALL SPEAK(26)
+            goto g2011;                                                                     //        GOTO 2011
+     g9003: if ((IPLACE[4] == -1) || (IPLACE[4] == J)) goto g9004;                          //9003    IF((IPLACE(4).EQ.-1).OR.(IPLACE(4).EQ.J)) GOTO 9004
+            Speak(27);                                                                      //        CALL SPEAK(27)
+            goto g2011;                                                                     //        GOTO 2011
+     g9004: IPLACE[JOBJ] = -1;                                                              //9004    IPLACE(JOBJ)=-1
+     g9005: if (IOBJ[J] != JOBJ) goto g9006;                                                //9005    IF(IOBJ(J).NE.JOBJ) GOTO 9006
+            IOBJ[J] = ICHAIN[JOBJ];                                                         //        IOBJ(J)=ICHAIN(JOBJ)
+            goto g2009;                                                                     //        GOTO 2009
+     g9006: int ITEMP = IOBJ[J];                                                            //9006    ITEMP=IOBJ(J)
+     g9007: if (ICHAIN[ITEMP] == JOBJ) goto g9008;                                          //9007    IF(ICHAIN(ITEMP).EQ.(JOBJ)) GOTO 9008
+            ITEMP = ICHAIN[ITEMP];                                                          //        ITEMP=ICHAIN(ITEMP)
+            goto g9007;                                                                     //        GOTO 9007
+     g9008: ICHAIN[ITEMP] = ICHAIN[JOBJ];                                                   //9008    ICHAIN(ITEMP)=ICHAIN(JOBJ)
+            goto g2009;                                                                     //        GOTO 2009
                                                                                             //
                                                                                             //
+            // Lock, unlock, no object yet                                                  //C LOCK, UNLOCK, NO OBJECT YET
                                                                                             //
-                                                                                            //C LIGHT LAMP
+     g9403: if ((J == 8) || (J == 9)) goto g5105;                                           //9403    IF((J.EQ.8).OR.(J.EQ.9))GOTO 5105
+     g5032: Speak(28);                                                                      //5032    CALL SPEAK(28)
+            goto g2011;                                                                     //        GOTO 2011
+     g5105: JOBJ = GRATE;                                                                   //5105    JOBJ=GRATE
+            goto g2027;                                                                     //        GOTO 2027
                                                                                             //
-                                                                                            //9404    IF((IPLACE(2).NE.J).AND.(IPLACE(2).NE.-1))GOTO 5200
-                                                                                            //        PROP(2)=1
-                                                                                            //        IDARK=0
-                                                                                            //        CALL SPEAK(39)
-                                                                                            //        GOTO 2011
+            //Discard object                                                                //C DISCARD OBJECT
                                                                                             //
-                                                                                            //C LAMP OFF
+     g5066: if (JOBJ == 18) goto g2009;                                                     //5066    IF(JOBJ.EQ.18)GOTO 2009
+            if (IPLACE[JOBJ] != -1) goto g5200;                                             //        IF(IPLACE(JOBJ).NE.-1) GOTO 5200
+     g5012: if ((JOBJ != BIRD) || (J != 19) || (PROP[11] == 1)) goto g9401;                 //5012    IF((JOBJ.NE.BIRD).OR.(J.NE.19).OR.(PROP(11).EQ.1))GOTO 9401
+            Speak(30);                                                                      //        CALL SPEAK(30)
+            PROP[11] = 1;                                                                   //        PROP(11)=1
+     g5160: ICHAIN[JOBJ] = IOBJ[J];                                                         //5160    ICHAIN(JOBJ)=IOBJ(J)
+            IOBJ[J] = JOBJ;                                                                 //        IOBJ(J)=JOBJ
+            IPLACE[JOBJ] = J;                                                               //        IPLACE(JOBJ)=J
+            goto g2011;                                                                     //        GOTO 2011
                                                                                             //
-                                                                                            //9406    IF((IPLACE(2).NE.J).AND.(IPLACE(2).NE.-1)) GOTO 5200
-                                                                                            //        PROP(2)=0
-                                                                                            //        CALL SPEAK(40)
-                                                                                            //        GOTO 2011
+     g9401: Speak(54);                                                                      //9401    CALL SPEAK(54)
+            goto g5160;                                                                     //        GOTO 5160
                                                                                             //
-                                                                                            //C STRIKE
+            // Lock, unlock object                                                          //C LOCK,UNLOCK OBJECT
                                                                                             //
-                                                                                            //5081    IF(JOBJ.NE.12)GOTO 5200
-                                                                                            //        PROP(12)=1
-                                                                                            //        GOTO 2003
+     g5031: if (IPLACE[KEYS] != -1 && IPLACE[KEYS] != J) goto g5200;                        //5031    IF(IPLACE(KEYS).NE.-1.AND.IPLACE(KEYS).NE.J)GOTO 5200
+            if (JOBJ != 4) goto g5102;                                                      //        IF(JOBJ.NE.4)GOTO 5102
+            Speak(32);                                                                      //        CALL SPEAK(32)
+            goto g2011;                                                                     //        GOTO 2011
+     g5102: if (JOBJ != KEYS) goto g5104;                                                   //5102    IF(JOBJ.NE.KEYS)GOTO 5104
+            Speak(55);                                                                      //        CALL SPEAK(55)
+            goto g2011;                                                                     //        GOTO 2011
+     g5104: if (JOBJ == GRATE) goto g5107;                                                  //5104    IF(JOBJ.EQ.GRATE)GOTO 5107
+            Speak(33);                                                                      //        CALL SPEAK(33)
+            goto g2011;                                                                     //        GOTO 2011
+     g5107: if (JVERB == 4) goto g5033;                                                     //5107    IF(JVERB.EQ.4) GOTO 5033
+            if (PROP[GRATE] != 0) goto g5034;                                               //        IF(PROP(GRATE).NE.0)GOTO 5034
+            Speak(34);                                                                      //        CALL SPEAK(34)
+            goto g2011;                                                                     //        GOTO 2011
+     g5034: Speak(35);                                                                      //5034    CALL SPEAK(35)
+            PROP[GRATE] = 0;                                                                //        PROP(GRATE)=0
+            PROP[8] = 0;                                                                    //        PROP(8)=0
+            goto g2011;                                                                     //        GOTO 2011
+     g5033: if (PROP[GRATE] == 0) goto g5109;                                               //5033    IF(PROP(GRATE).EQ.0)GOTO 5109
+            Speak(36);                                                                      //        CALL SPEAK(36)
+            goto g2011;                                                                     //        GOTO 2011
+     g5109: Speak(37);                                                                      //5109    CALL SPEAK(37)
+            PROP[GRATE] = 1;                                                                //        PROP(GRATE)=1
+            PROP[8] = 1;                                                                    //        PROP(8)=1
+            goto g2011;                                                                     //        GOTO 2011
                                                                                             //
-                                                                                            //C ATTACK
                                                                                             //
-                                                                                            //5300    DO 5313 ID=1,3
-                                                                                            //        IID=ID
-                                                                                            //        IF(DSEEN(ID).NE.0)GOTO 5307
-                                                                                            //5313    CONTINUE
-                                                                                            //        IF(JOBJ.EQ.0)GOTO 5062
-                                                                                            //        IF(JOBJ.EQ.SNAKE) GOTO 5200
-                                                                                            //        IF(JOBJ.EQ.BIRD) GOTO 5302
-                                                                                            //        CALL SPEAK(44)
-                                                                                            //        GOTO 2011
-                                                                                            //5302    CALL SPEAK(45)
-                                                                                            //        IPLACE(JOBJ)=300
-                                                                                            //        GOTO 9005
                                                                                             //
-                                                                                            //5307    IF(RAN(QZ).GT.0.4) GOTO 5309
-                                                                                            //        DSEEN(IID)=0
-                                                                                            //        ODLOC(IID)=0
-                                                                                            //        DLOC(IID)=0
-                                                                                            //        CALL SPEAK(47)
-                                                                                            //        GOTO 5311
-                                                                                            //5309    CALL SPEAK(48)
-                                                                                            //5311    K=21
-                                                                                            //        GOTO 5014
+            // Light lamp                                                                   //C LIGHT LAMP
                                                                                             //
-                                                                                            //C EAT
+     g9404: if ((IPLACE[2] != J) && (IPLACE[2] != -1)) goto g5200;                          //9404    IF((IPLACE(2).NE.J).AND.(IPLACE(2).NE.-1))GOTO 5200
+            PROP[2] = 1;                                                                    //        PROP(2)=1
+            IDARK = 0;                                                                      //        IDARK=0
+            Speak(39);                                                                      //        CALL SPEAK(39)
+            goto g2011;                                                                     //        GOTO 2011
                                                                                             //
-                                                                                            //5502    IF((IPLACE(FOOD).NE.J.AND.IPLACE(FOOD).NE.-1).OR.PROP(FOOD).NE.0
-                                                                                            //        1 .OR.JOBJ.NE.FOOD)GOTO 5200
-                                                                                            //        PROP(FOOD)=1
-                                                                                            //5501    JSPK=72
-                                                                                            //        GOTO 5200
+            // Lamp off                                                                     //C LAMP OFF
                                                                                             //
-                                                                                            //C DRINK
+     g9406: if ((IPLACE[2] != J) && (IPLACE[2] != -1)) goto g5200;                          //9406    IF((IPLACE(2).NE.J).AND.(IPLACE(2).NE.-1)) GOTO 5200
+            PROP[2] = 0;                                                                    //        PROP(2)=0
+            Speak(40);                                                                      //        CALL SPEAK(40)
+            goto g2011;                                                                     //        GOTO 2011
                                                                                             //
-                                                                                            //5504    IF((IPLACE(WATER).NE.J.AND.IPLACE(WATER).NE.-1)
-                                                                                            //        1 .OR.PROP(WATER).NE.0.OR.JOBJ.NE.WATER) GOTO 5200
-                                                                                            //        PROP(WATER)=1
-                                                                                            //        JSPK=74
-                                                                                            //        GOTO 5200
+            // Strike                                                                       //C STRIKE
                                                                                             //
-                                                                                            //C RUB
+     g5081: if (JOBJ != 12) goto g5200;                                                     //5081    IF(JOBJ.NE.12)GOTO 5200
+            PROP[12] = 1;                                                                   //        PROP(12)=1
+            goto g2003;                                                                     //        GOTO 2003
                                                                                             //
-                                                                                            //5505    IF(JOBJ.NE.LAMP)JSPK=76
-                                                                                            //        GOTO 5200
+            // Attack                                                                       //C ATTACK
                                                                                             //
-                                                                                            //C POUR
+     g5300: int IID;
+            for (int ID = 1; ID < 3; ++ID)                                                  //5300    DO 5313 ID=1,3
+            {
+                IID = ID;                                                                   //        IID=ID
+                if (DSEEN[ID] != 0) goto g5307;                                             //        IF(DSEEN(ID).NE.0)GOTO 5307
+            }                                                                               //5313    CONTINUE
+            if (JOBJ == 0) goto g5062;                                                      //        IF(JOBJ.EQ.0)GOTO 5062
+            if (JOBJ == SNAKE) goto g5200;                                                  //        IF(JOBJ.EQ.SNAKE) GOTO 5200
+            if (JOBJ == BIRD) goto g5302;                                                   //        IF(JOBJ.EQ.BIRD) GOTO 5302
+            Speak(44);                                                                      //        CALL SPEAK(44)
+            goto g2011;                                                                     //        GOTO 2011
+     g5302: Speak(45);                                                                      //5302    CALL SPEAK(45)
+            IPLACE[JOBJ] = 300;                                                             //        IPLACE(JOBJ)=300
+            goto g9005;                                                                     //        GOTO 9005
                                                                                             //
-                                                                                            //5506    IF(JOBJ.NE.WATER)JSPK=78
-                                                                                            //        PROP(WATER)=1
-                                                                                            //        GOTO 5200
+     g5307: if (RAN.NextDouble() > 0.4) goto g5309;                                         //5307    IF(RAN(QZ).GT.0.4) GOTO 5309
+            DSEEN[IID] = 0;                                                                 //        DSEEN(IID)=0
+            ODLOC[IID] = 0;                                                                 //        ODLOC(IID)=0
+            DLOC[IID] = 0;                                                                  //        DLOC(IID)=0
+            Speak(47);                                                                      //        CALL SPEAK(47)
+            goto g5311;                                                                     //        GOTO 5311
+     g5309: Speak(48);                                                                      //5309    CALL SPEAK(48)
+     g5311: K = 21;                                                                         //5311    K=21
+            goto g5014;                                                                     //        GOTO 5014
+                                                                                            //
+            // Eat                                                                          //C EAT
+                                                                                            //
+     g5502: if ((IPLACE[FOOD] != J && IPLACE[FOOD] != -1) || PROP[FOOD] != 0                //5502    IF((IPLACE(FOOD).NE.J.AND.IPLACE(FOOD).NE.-1).OR.PROP(FOOD).NE.0
+                 || JOBJ!= FOOD) goto g5200;                                                //        1 .OR.JOBJ.NE.FOOD)GOTO 5200
+            PROP[FOOD] = 1;                                                                 //        PROP(FOOD)=1
+     g5501: JSPK = 72;                                                                      //5501    JSPK=72
+            goto g5200;                                                                     //        GOTO 5200
+                                                                                            //
+            // Drink                                                                        //C DRINK
+                                                                                            //
+     g5504: if ((IPLACE[WATER] != J && IPLACE[WATER] != -1)                                 //5504    IF((IPLACE(WATER).NE.J.AND.IPLACE(WATER).NE.-1)
+                || PROP[WATER] != 0 || JOBJ != WATER) goto g5200;                           //        1 .OR.PROP(WATER).NE.0.OR.JOBJ.NE.WATER) GOTO 5200
+            PROP[WATER] = 1;                                                                //        PROP(WATER)=1
+            JSPK = 74;                                                                      //        JSPK=74
+            goto g5200;                                                                     //        GOTO 5200
+                                                                                            //
+            // Rub                                                                          //C RUB
+                                                                                            //
+     g5505: if (JOBJ != LAMP) JSPK = 76;                                                    //5505    IF(JOBJ.NE.LAMP)JSPK=76
+            goto g5200;                                                                     //        GOTO 5200
+                                                                                            //
+            // Pour                                                                         //C POUR
+                                                                                            //
+     g5506: if (JOBJ != WATER) JSPK = 78;                                                   //5506    IF(JOBJ.NE.WATER)JSPK=78
+            PROP[WATER] = 1;                                                                //        PROP(WATER)=1
+            goto g5200;                                                                     //        GOTO 5200
                                                                                             //
                                                                                             //
                                                                                             //
@@ -826,7 +877,7 @@ namespace adventure
          }                                                                                  //        END
                                                                                             //
                                                                                             //
-        public static void GetIn(ref int TWOW, ref string B, ref string C, int D)                  //        SUBROUTINE GETIN(TWOW,B,C,D)
+        public static void GetIn(ref int TWOW, ref string B, ref string C, ref string D)    //        SUBROUTINE GETIN(TWOW,B,C,D)
         {                                                                                   //        IMPLICIT INTEGER(A-Z)
             //I'm not porting this function                                                 //        DATA M2/"4000000000,"20000000,"100000,"400,"2,0/
             //The PDP10 used int36 as it's word, and could store 5 ASCII-7                  //6       ACCEPT 1,(A(I), I=1,4)
@@ -835,33 +886,34 @@ namespace adventure
             TWOW = 0;                                                                       //        TWOW=0
             B = "";                                                                         //        S=0
             C = "";                                                                         //        B=A(1)
-            var line = Console.ReadLine();                                                  //        DO 2 J=1,4
-            var words = line.Split(null);                                                   //        DO 2 K=1,5
-                                                                                            //        MASK1="774000000000
-                                                                                            //        IF(K.NE.1) MASK1="177*M2(K)
-            if (words.Length != 0)                                                          //        IF(S.EQ.0) GOTO 2
-            {                                                                               //        TWOW=1
-                B = words[0].Substring(0, Math.Min(5, words[0].Length))                     //        CALL SHIFT(A(J),7*(K-1),XX)
-                    .ToUpper(CultureInfo.InvariantCulture);                                 //        CALL SHIFT(A(J+1),7*(K-6),YY)
-                if (words.Length > 1)                                                       //        MASK=-M2(6-K)
-                    {                                                                       //        C=(XX.AND.MASK)+(YY.AND.(-2-MASK))
-                        C = words[1].Substring(0, Math.Min(5, words[0].Length))             //        GOTO 4
-                        .ToUpper(CultureInfo.InvariantCulture);                             //3       IF(S.EQ.1) GOTO 2
-                TWOW = 1;                                                                   //        S=1
-                }                                                                           //        IF(J.EQ.1) B=(B.AND.-M2(K)).OR.("201004020100.AND.
-            }                                                                               //        1 (-M2(K).XOR.-1))
-                                                                                            //2       CONTINUE
-                                                                                            //4       D=A(2)
-                                                                                            //        RETURN
+            D = "";                                                                         //        DO 2 J=1,4
+            var line = Console.ReadLine();                                                  //        DO 2 K=1,5
+            var words = line.Split(null);                                                   //        MASK1="774000000000
+            if (words.Length != 0)                                                          //        IF(K.NE.1) MASK1="177*M2(K)
+            {                                                                               //        IF(S.EQ.0) GOTO 2
+                B = words[0].Substring(0, Math.Min(5, words[0].Length))                     //        TWOW=1
+                    .ToUpper(CultureInfo.InvariantCulture);                                 //        CALL SHIFT(A(J),7*(K-1),XX)
+                if (words[0].Length > 5)                                                    //        CALL SHIFT(A(J+1),7*(K-6),YY)
+                    D = words[0].Substring(5, words[0].Length - 5)                          //        MASK=-M2(6-K)
+                        .ToUpper(CultureInfo.InvariantCulture);                             //        C=(XX.AND.MASK)+(YY.AND.(-2-MASK))
+                                                                                            //        GOTO 4
+                if (words.Length > 1)                                                       //3       IF(S.EQ.1) GOTO 2
+                {                                                                           //        S=1
+                    C = words[1].Substring(0, Math.Min(5, words[1].Length))                 //        IF(J.EQ.1) B=(B.AND.-M2(K)).OR.("201004020100.AND.
+                        .ToUpper(CultureInfo.InvariantCulture);                             //        1 (-M2(K).XOR.-1))
+                TWOW = 1;                                                                   //2       CONTINUE
+                }                                                                           //4       D=A(2)
+            }                                                                               //        RETURN
         }                                                                                   //        END
                                                                                             //
-        public static void Yes(int X, int Y, int Z, ref int YEA)                                   //        SUBROUTINE YES(X,Y,Z,YEA)
+        public static void Yes(int X, int Y, int Z, ref int YEA)                            //        SUBROUTINE YES(X,Y,Z,YEA)
         {                                                                                   //        IMPLICIT INTEGER(A-Z)
             string IA1 = "";
             string JUNK2 = "";
-            int IB1 = 0, JUNK = 0;
+            string IB1 = "";
+            int JUNK = 0;
             Speak(X);                                                                       //        CALL SPEAK(X)
-            GetIn(ref JUNK, ref IA1, ref JUNK2, IB1);                                                //        CALL GETIN(JUNK,IA1,JUNK,IB1)
+            GetIn(ref JUNK, ref IA1, ref JUNK2, ref IB1);                                   //        CALL GETIN(JUNK,IA1,JUNK,IB1)
             if (IA1 == "NO" || IA1 == "N") goto y1;                                         //        IF(IA1.EQ.'NO'.OR.IA1.EQ.'N') GOTO 1
             YEA = 1;                                                                        //        YEA=1
             if (Y != 0) Speak(Y);                                                           //        IF(Y.NE.0) CALL SPEAK(Y)
