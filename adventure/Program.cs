@@ -61,6 +61,9 @@ namespace adventure
             int FOOD = 0;
             int WATER = 0;
             int AXE = 0;
+            int K = 0;
+            int LOLD = 0;
+            int JVERB = 0;
 
             if (SETUP != 0) goto g1;                                                        //        IF(SETUP.NE.0) GOTO 1
             SETUP = 1;                                                                      //        SETUP=1
@@ -113,13 +116,13 @@ namespace adventure
             line = line.Substring(match.Groups[0].Length);                                  //1005    FORMAT(1G,20A5)
             int JKIND = int.Parse(match.Groups[0].Value);
             var matches = Regex.Matches((line), ".{0,5}");
-            int j = 3;
+            int J = 3;
             Debug.WriteLine("read strings");
             foreach (Match aMatch in matches)
             {
-                LLINE[I, j] = aMatch.Groups[0].Value;
-                Debug.Write(LLINE[I, j]);
-                j += 1;
+                LLINE[I, J] = aMatch.Groups[0].Value;
+                Debug.Write(LLINE[I, J]);
+                J += 1;
             }
             Debug.WriteLine(".");
                                                                                             
@@ -357,126 +360,143 @@ namespace adventure
                                                                                             //
                                                                                             //
      g71:   KK=STEXT[L];                                                                    //71      KK=STEXT(L)
-                                                                                            //        IF(ABB(L).EQ.0.OR.KK.EQ.0)KK=LTEXT(L)
-                                                                                            //        IF(KK.EQ.0) GOTO 7
-                                                                                            //4      TYPE 5,(LLINE(KK,JJ),JJ=3,LLINE(KK,2))
-                                                                                            //5      FORMAT(20A5)
-                                                                                            //        KK=KK+1
-                                                                                            //        IF(LLINE(KK-1,1).NE.0) GOTO 4
-                                                                                            //        TYPE 6
+            if (ABB[L] == 0 || KK == 0) KK = LTEXT[L];                                      //        IF(ABB(L).EQ.0.OR.KK.EQ.0)KK=LTEXT(L)
+            if (KK == 0) goto g7;                                                           //        IF(KK.EQ.0) GOTO 7
+     g4:    for (int jj = 3; jj <= (int)LLINE[KK,2]; ++jj)                                  //4      TYPE 5,(LLINE(KK,JJ),JJ=3,LLINE(KK,2))
+                Console.Write(LLINE[KK, jj]);                                               //5      FORMAT(20A5)
+            Console.WriteLine();
+            KK = KK + 1;                                                                    //        KK=KK+1
+            if ((int)LLINE[KK-1, 1] != 0) goto g4;                                          //        IF(LLINE(KK-1,1).NE.0) GOTO 4
+            Console.WriteLine();                                                            //        TYPE 6
                                                                                             //6      FORMAT(/)
-                                                                                            //7      IF(COND(L).EQ.2)GOTO 8
-                                                                                            //        IF(LOC.EQ.33.AND.RAN(QZ).LT.0.25)CALL SPEAK(8)
-                                                                                            //        J=L
-                                                                                            //        GOTO 2000
+     g7:    if (COND[L] == 2) goto g8;                                                      //7      IF(COND(L).EQ.2)GOTO 8
+            if (LOC == 33 && RAN.NextDouble() < 0.25) Speak(8);                             //        IF(LOC.EQ.33.AND.RAN(QZ).LT.0.25)CALL SPEAK(8)
+            J = L;                                                                          //        J=L
+            goto g2000;                                                                     //        GOTO 2000
                                                                                             //
-                                                                                            //C GO GET A NEW LOCATION
+            // Go get a new location                                                        //C GO GET A NEW LOCATION
                                                                                             //
-                                                                                            //8       KK=KEY(LOC)
-                                                                                            //        IF(KK.EQ.0)GOTO 19
-                                                                                            //        IF(K.EQ.57)GOTO 32
-                                                                                            //        IF(K.EQ.67)GOTO 40
-                                                                                            //        IF(K.EQ.8)GOTO 12
-                                                                                            //        LOLD=L
-                                                                                            //9       LL=TRAVEL(KK)
-                                                                                            //        IF(LL.LT.0) LL=-LL
-                                                                                            //        IF(1.EQ.MOD(LL,1024))GOTO 10
-                                                                                            //        IF(K.EQ.MOD(LL,1024))GOTO 10
-                                                                                            //        IF(TRAVEL(KK).LT.0)GOTO 11
-                                                                                            //        KK=KK+1
-                                                                                            //        GOTO 9
-                                                                                            //12      TEMP=LOLD
-                                                                                            //        LOLD=L
-                                                                                            //        L=TEMP
-                                                                                            //        GOTO 21
-                                                                                            //10      L=LL/1024
-                                                                                            //        GOTO 21
-                                                                                            //11      JSPK=12
-                                                                                            //        IF(K.GE.43.AND.K.LE.46)JSPK=9
-                                                                                            //        IF(K.EQ.29.OR.K.EQ.30)JSPK=9
-                                                                                            //        IF(K.EQ.7.OR.K.EQ.8.OR.K.EQ.36.OR.K.EQ.37.OR.K.EQ.68)
-                                                                                            //        1 JSPK=10
-                                                                                            //        IF(K.EQ.11.OR.K.EQ.19)JSPK=11
-                                                                                            //        IF(JVERB.EQ.1)JSPK=59
-                                                                                            //        IF(K.EQ.48)JSPK=42
-                                                                                            //        IF(K.EQ.17)JSPK=80
-                                                                                            //        CALL SPEAK(JSPK)
-                                                                                            //        GOTO 2
-                                                                                            //19      CALL SPEAK(13)
-                                                                                            //        L=LOC
-                                                                                            //        IF(IFIRST.EQ.0) CALL SPEAK(14)
-                                                                                            //21      IF(L.LT.300)GOTO 2
-                                                                                            //        IL=L-300+1
-                                                                                            //        GOTO(22,23,24,25,26,31,27,28,29,30,33,34,36,37)IL
-                                                                                            //        GOTO 2
+     g8:    KK = KEY[LOC];                                                                  //8       KK=KEY(LOC)
+            if (KK == 0) goto g19;                                                          //        IF(KK.EQ.0)GOTO 19
+            if (K == 57) goto g32;                                                          //        IF(K.EQ.57)GOTO 32
+            if (K == 67) goto g40;                                                          //        IF(K.EQ.67)GOTO 40
+            if (K == 8) goto g12;                                                           //        IF(K.EQ.8)GOTO 12
+            LOLD = L;                                                                       //        LOLD=L
+     g9:    int LL = TRAVEL[KK];                                                            //9       LL=TRAVEL(KK)
+            if (LL < 0) LL = -LL;                                                           //        IF(LL.LT.0) LL=-LL
+            if (1 == LL%1024) goto g10;                                                     //        IF(1.EQ.MOD(LL,1024))GOTO 10
+            if (K == LL%1024) goto g10;                                                     //        IF(K.EQ.MOD(LL,1024))GOTO 10
+            if (TRAVEL[KK] < 0) goto g11;                                                   //        IF(TRAVEL(KK).LT.0)GOTO 11
+            KK = KK + 1;                                                                    //        KK=KK+1
+            goto g9;                                                                        //        GOTO 9
+     g12:   int TEMP = LOLD;                                                                //12      TEMP=LOLD
+            LOLD = L;                                                                       //        LOLD=L
+            L = TEMP;                                                                       //        L=TEMP
+            goto g21;                                                                       //        GOTO 21
+     g10:   L=LL/1024;                                                                      //10      L=LL/1024
+            goto g21;                                                                       //        GOTO 21
+     g11:   int JSPK = 12;                                                                  //11      JSPK=12
+            if (K >= 43 && K <= 46) JSPK = 9;                                               //        IF(K.GE.43.AND.K.LE.46)JSPK=9
+            if (K == 29 || K == 30) JSPK = 9;                                               //        IF(K.EQ.29.OR.K.EQ.30)JSPK=9
+            if (K == 7 || K == 8 || K == 36 || K == 37 || K == 68)                          //        IF(K.EQ.7.OR.K.EQ.8.OR.K.EQ.36.OR.K.EQ.37.OR.K.EQ.68)
+                JSPK = 10;                                                                  //        1 JSPK=10
+            if (K == 1 || K == 19) JSPK = 11;                                               //        IF(K.EQ.11.OR.K.EQ.19)JSPK=11
+            if (JVERB == 1) JSPK = 59;                                                      //        IF(JVERB.EQ.1)JSPK=59
+            if (K == 48) JSPK = 42;                                                         //        IF(K.EQ.48)JSPK=42
+            if (K == 17) JSPK = 80;                                                         //        IF(K.EQ.17)JSPK=80
+            Speak(JSPK);                                                                    //        CALL SPEAK(JSPK)
+            goto g2;                                                                        //        GOTO 2
+     g19:   Speak(13);                                                                      //19      CALL SPEAK(13)
+            L = LOC;                                                                        //        L=LOC
+            if (IFIRST == 0) Speak(14);                                                     //        IF(IFIRST.EQ.0) CALL SPEAK(14)
+     g21:   if (L < 300) goto g2;                                                           //21      IF(L.LT.300)GOTO 2
+            int IL = L - 300 + 1;                                                           //        IL=L-300+1
+            switch(IL)                                                                      //        GOTO(22,23,24,25,26,31,27,28,29,30,33,34,36,37)IL
+            {
+                case 1: goto g22; break;
+                case 2: goto g23; break;
+                case 3: goto g24; break;
+                case 4: goto g25; break;
+                case 5: goto g26; break;
+                case 6: goto g31; break;
+                case 7: goto g27; break;
+                case 8: goto g28; break;
+                case 9: goto g29; break;
+                case 10: goto g30; break;
+                case 11: goto g33; break;
+                case 12: goto g34; break;
+                case 13: goto g36; break;
+                case 14: goto g37; break;
+            }
+            goto g2;                                                                        //        GOTO 2
                                                                                             //
-                                                                                            //22      L=6
-                                                                                            //        IF(RAN(QZ).GT.0.5) L=5
-                                                                                            //        GOTO 2
-                                                                                            //23      L=23
-                                                                                            //        IF(PROP(GRATE).NE.0) L=9
-                                                                                            //        GOTO 2
-                                                                                            //24      L=9
-                                                                                            //        IF(PROP(GRATE).NE.0)L=8
-                                                                                            //        GOTO 2
-                                                                                            //25      L=20
-                                                                                            //        IF(IPLACE(NUGGET).NE.-1)L=15
-                                                                                            //        GOTO 2
-                                                                                            //26      L=22
-                                                                                            //        IF(IPLACE(NUGGET).NE.-1) L=14
-                                                                                            //        GOTO 2
-                                                                                            //27      L=27
-                                                                                            //        IF(PROP(12).EQ.0)L=31
-                                                                                            //        GOTO 2
-                                                                                            //28      L=28
-                                                                                            //        IF(PROP(SNAKE).EQ.0)L=32
-                                                                                            //        GOTO 2
-                                                                                            //29      L=29
-                                                                                            //        IF(PROP(SNAKE).EQ.0) L=32
-                                                                                            //        GOTO 2
-                                                                                            //30      L=30
-                                                                                            //        IF(PROP(SNAKE).EQ.0) L=32
-                                                                                            //        GOTO 2
-                                                                                            //31      PAUSE 'GAME IS OVER'
-                                                                                            //        GOTO 1100
-                                                                                            //32      IF(IDETAL.LT.3)CALL SPEAK(15)
-                                                                                            //        IDETAL=IDETAL+1
-                                                                                            //        L=LOC
-                                                                                            //        ABB(L)=0
-                                                                                            //        GOTO 2
-                                                                                            //33      L=8
-                                                                                            //        IF(PROP(GRATE).EQ.0) L=9
-                                                                                            //        GOTO 2
-                                                                                            //34      IF(RAN(QZ).GT.0.2)GOTO 35
-                                                                                            //        L=68
-                                                                                            //        GOTO 2
-                                                                                            //35      L=65
-                                                                                            //38      CALL SPEAK(56)
-                                                                                            //        GOTO 2
-                                                                                            //36      IF(RAN(QZ).GT.0.2)GOTO 35
-                                                                                            //        L=39
-                                                                                            //        IF(RAN(QZ).GT.0.5)L=70
-                                                                                            //        GOTO 2
-                                                                                            //37      L=66
-                                                                                            //        IF(RAN(QZ).GT.0.4)GOTO 38
-                                                                                            //        L=71
-                                                                                            //        IF(RAN(QZ).GT.0.25)L=72
-                                                                                            //        GOTO 2
-                                                                                            //39      L=66
-                                                                                            //        IF(RAN(QZ).GT.0.2)GOTO 38
-                                                                                            //        L=77
-                                                                                            //        GOTO 2
-                                                                                            //40      IF(LOC.LT.8)CALL SPEAK(57)
-                                                                                            //        IF(LOC.GE.8)CALL SPEAK(58)
-                                                                                            //        L=LOC
-                                                                                            //        GOTO 2
+     g22:   L = 6;                                                                          //22      L=6
+            if (RAN.NextDouble() > 0.5) L = 5;                                              //        IF(RAN(QZ).GT.0.5) L=5
+            goto g2;                                                                        //        GOTO 2
+     g23:   L = 23;                                                                         //23      L=23
+            if (PROP[GRATE] != 0) L = 9;                                                    //        IF(PROP(GRATE).NE.0) L=9
+            goto g2;                                                                        //        GOTO 2
+     g24:   L = 9;                                                                          //24      L=9
+            if (PROP[GRATE] != 0) L = 8;                                                    //        IF(PROP(GRATE).NE.0)L=8
+            goto g2;                                                                        //        GOTO 2
+     g25:   L = 20;                                                                         //25      L=20
+            if (IPLACE[NUGGET] != -1) L = 15;                                               //        IF(IPLACE(NUGGET).NE.-1)L=15
+            goto g2;                                                                        //        GOTO 2
+     g26:   L = 22;                                                                         //26      L=22
+            if (IPLACE[NUGGET] != -1) L = 14;                                               //        IF(IPLACE(NUGGET).NE.-1) L=14
+            goto g2;                                                                        //        GOTO 2
+     g27:   L = 27;                                                                         //27      L=27
+            if (PROP[12] == 0) L = 31;                                                      //        IF(PROP(12).EQ.0)L=31
+            goto g2;                                                                        //        GOTO 2
+     g28:   L = 28;                                                                         //28      L=28
+            if (PROP[SNAKE] == 0) L = 32;                                                   //        IF(PROP(SNAKE).EQ.0)L=32
+            goto g2;                                                                        //        GOTO 2
+     g29:   L = 29;                                                                         //29      L=29
+            if (PROP[SNAKE] == 0) L = 32;                                                   //        IF(PROP(SNAKE).EQ.0) L=32
+            goto g2;                                                                        //        GOTO 2
+     g30:   L = 30;                                                                         //30      L=30
+            if (PROP[SNAKE] == 0) L = 32;                                                   //        IF(PROP(SNAKE).EQ.0) L=32
+            goto g2;                                                                        //        GOTO 2
+     g31:   Console.WriteLine("Game is over");                                              //31      PAUSE 'GAME IS OVER'
+            goto g1100;                                                                     //        GOTO 1100
+     g32:   if (IDETAL < 3) Speak(15);                                                      //32      IF(IDETAL.LT.3)CALL SPEAK(15)
+            IDETAL = IDETAL + 1;                                                            //        IDETAL=IDETAL+1
+            L = LOC;                                                                        //        L=LOC
+            ABB[L] = 0;                                                                     //        ABB(L)=0
+            goto g2;                                                                        //        GOTO 2
+     g33:   L = 8;                                                                          //33      L=8
+            if (PROP[GRATE] == 0) L = 9;                                                    //        IF(PROP(GRATE).EQ.0) L=9
+            goto g2;                                                                        //        GOTO 2
+     g34:   if (RAN.NextDouble() > 0.2) goto g35;                                           //34      IF(RAN(QZ).GT.0.2)GOTO 35
+            L = 68;                                                                         //        L=68
+            goto g2;                                                                        //        GOTO 2
+     g35:   L = 65;                                                                         //35      L=65
+     g38:   Speak(56);                                                                      //38      CALL SPEAK(56)
+            goto g2;                                                                        //        GOTO 2
+     g36:   if (RAN.NextDouble() > 0.2) goto g35;                                           //36      IF(RAN(QZ).GT.0.2)GOTO 35
+            L = 39;                                                                         //        L=39
+            if (RAN.NextDouble() > 0.5) L = 70;                                             //        IF(RAN(QZ).GT.0.5)L=70
+            goto g2;                                                                        //        GOTO 2
+     g37:   L = 66;                                                                         //37      L=66
+            if (RAN.NextDouble() > 0.4) goto g38;                                           //        IF(RAN(QZ).GT.0.4)GOTO 38
+            L = 71;                                                                         //        L=71
+            if (RAN.NextDouble() > 0.25) L = 72;                                            //        IF(RAN(QZ).GT.0.25)L=72
+            goto g2;                                                                        //        GOTO 2
+     g39:   L = 66;                                                                         //39      L=66
+            if (RAN.NextDouble() > 0.2) goto g38;                                           //        IF(RAN(QZ).GT.0.2)GOTO 38
+            L = 77;                                                                         //        L=77
+            goto g2;                                                                        //        GOTO 2
+     g40:   if (LOC < 8) Speak(57);                                                         //40      IF(LOC.LT.8)CALL SPEAK(57)
+            if (LOC >= 8) Speak(58);                                                        //        IF(LOC.GE.8)CALL SPEAK(58)
+            L = LOC;                                                                        //        L=LOC
+            goto g2;                                                                        //        GOTO 2
                                                                                             //
                                                                                             //
                                                                                             //
-                                                                                            //C DO NEXT INPUT
+            // Do next input                                                                //C DO NEXT INPUT
                                                                                             //
                                                                                             //
-                                                                                            //2000    LTRUBL=0
+     g2000: Debug.WriteLine("g2000");                                                       //2000    LTRUBL=0
                                                                                             //        LOC=J
                                                                                             //        ABB(J)=MOD((ABB(J)+1),5)
                                                                                             //        IDARK=0
